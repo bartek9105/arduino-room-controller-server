@@ -10,11 +10,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@serialport/parser-readline": "^9.0.7",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "johnny-five": "^2.0.0",
     "morgan": "^1.10.0",
-    "node-pixel": "^0.11.0"
+    "node-pixel": "^0.11.0",
+    "serialport": "^9.1.0",
+    "socket.io": "^4.1.2",
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"

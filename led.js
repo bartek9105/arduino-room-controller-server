@@ -3,19 +3,41 @@ const five = require("johnny-five");
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const WebSocket = require('ws');
+
+const Readline = require('@serialport/parser-readline');
+const SerialPort = require('serialport')
+const port = new SerialPort('COM8', {
+  baudRate: 9600
+})
+const parser = port.pipe(new Readline({ delimiter: '\n' }));
 
 const app = express();
+const server = require('http').createServer(app)
+
+const ws = new WebSocket.Server({ server })
 
 app.use(express.json());
 app.use(cors());
 app.use(morgan('tiny'));
 
-const board = new five.Board({ port: 'COM8' });
+
+
+ws.on('connection', function connection(ws) {
+  console.log('New client connected')
+  ws.send('Welcome new client')
+  parser.on('data', function(data) {
+    console.log(data)
+    ws.send(data)
+  })
+})
+
 let strip = null;
+const board = new five.Board({ port: "COM9" })
 
 board.on("ready", function() {
   strip = new pixel.Strip({
-    board: this,
+    board: board,
     controller: "FIRMATA",
     strips: [{ pin: 6, length: 30 }],
     gamma: 2.8,
@@ -24,7 +46,7 @@ board.on("ready", function() {
   this.repl.inject({
     strip: strip
   });
-});
+})
 
 app.post('/led', (req, res) => {
   const { color } = req.body;
@@ -85,6 +107,6 @@ function colorWheel(WheelPos) {
   return "rgb(" + r + "," + g + "," + b + ")";
 }
 
-app.listen(3000, () => {
+server.listen(3000, () => {
   console.log('Listening on port 3000');
 });
