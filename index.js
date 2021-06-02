@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const WebSocket = require('ws');
 const dbConnection = require('./db');
 const { getRoomStats, saveRoomStats } = require('./services/roomStats.service');
+const { getRoomLogs, saveRoomLogs } = require('./services/roomLogs.service');
 
 const Readline = require('@serialport/parser-readline');
 const SerialPort = require('serialport')
@@ -30,7 +31,7 @@ ws.on('connection', function connection(ws) {
   console.log('New client connected')
   parser.on('data', async function(data) {
     console.log(data)
-    const [humidity, temperature] = data.split(',')
+    const [humidity, temperature, motionSensor] = data.split(',')
     await saveRoomStats(temperature, humidity)
     ws.send(data)
   })
@@ -75,6 +76,11 @@ app.post('/led/status', (req, res) => {
 app.get('/room-stats', async (req, res) => {
   const roomStats = await getRoomStats()
   res.send(roomStats)
+})
+
+app.get('/logs', async (req, res) => {
+  const roomLogs = await getRoomLogs()
+  res.send(roomLogs)
 })
 
 server.listen(3000, () => {
