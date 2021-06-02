@@ -1,9 +1,11 @@
+require('dotenv').config()
 const pixel = require("node-pixel");
 const five = require("johnny-five");
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const WebSocket = require('ws');
+const dbConnection = require('./db');
 
 const Readline = require('@serialport/parser-readline');
 const SerialPort = require('serialport')
@@ -14,6 +16,8 @@ const parser = port.pipe(new Readline({ delimiter: '\n' }));
 
 const app = express();
 const server = require('http').createServer(app)
+
+dbConnection();
 
 const ws = new WebSocket.Server({ server })
 
